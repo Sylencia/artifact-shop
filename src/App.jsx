@@ -1,44 +1,58 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
+import TextField from '@material-ui/core/TextField'
 import uniq from 'lodash/uniq'
 import uniqWith from 'lodash/uniqWith'
+import flatten from 'lodash/flatten'
 import isEqual from 'lodash/isEqual'
 import max from 'lodash/max'
+import pick from 'lodash/pick'
 import shortid from 'shortid'
 
-import logo from './logo.svg'
 import './App.css'
 
 class App extends PureComponent {
   constructor(props) {
     super(props)
 
-    this.solutions = []
-    this.heldSolutions = []
-    const consumables = [3, 3, 4, 5, 7, 10]
-    const armor = [3, 6, 6, 7, 8, 8, 9, 13, 15, 16, 19, 19, 25]
-    const weapons = [3, 6, 7, 7, 7, 7, 8, 10, 15, 19, 25]
-    const accessories = [3, 4, 5, 6, 6, 7, 10, 13, 15, 25]
-
-    const combined = [...consumables, ...armor, ...weapons, ...accessories]
-    this.costs = uniq(combined).sort((a, b) => a > b)
-    this.maxCost = max(this.costs)
-
     this.state = {
       total: 20,
-      items: 3,
+      cardsBought: 3,
+      costs: [],
+      readyToShow: false,
     }
   }
 
   componentDidMount() {
-    // Grab the manifest
+    // Grab the manifest and find the items
     fetch('https://raw.githubusercontent.com/ottah/ArtifactDB/master/cards-manifest.json')
       .then(response => response.json())
-      .then(data => this.setState({ data }))
+      .then(data => {
+        const isItemCard = card => card.Color === 'Yellow' && card.GoldCost > 0
+        const pickedFields = [
+          'Id',
+          'Name',
+          'ItemType',
+          'GoldCost',
+        ]
+        const items = flatten(data.Sets.map(set =>
+          set.Cards.filter(isItemCard).map(
+            card => pick(card, pickedFields)
+          )
+        ))
+
+        const costs = uniq(items.map(item => item.GoldCost))
+
+        console.log(items, costs)
+
+        this.setState({
+          items,
+          costs,
+          readyToShow: true })
+      })
   }
 
-  componentDidUpdate
-
   getPossibleOptions = (total, remainingItems, partial = []) => {
+    const { costs } = this.state
     const sum = partial.reduce((a, b) => a + b, 0)
 
     if (sum > total) {
@@ -55,40 +69,66 @@ class App extends PureComponent {
       }
     }
 
-    if (total - sum > remainingItems * this.maxCost) {
+    if (total - sum > remainingItems * max(costs)) {
       return
     }
 
-    for (let i = 0; i < this.costs.length; ++i) {
-      this.getPossibleOptions(total, remainingItems - 1, partial.concat(this.costs[i]))
+    for (let i = 0; i < costs.length; ++i) {
+      this.getPossibleOptions(total, remainingItems - 1, partial.concat(costs[i]))
     }
   }
 
-  onTotalChange = e => {
-    this.setState({ [e.target.name]: e.target.value })
+  onTextChange = name => e => {
+    this.setState({ [name]: e.target.value })
   }
 
   render() {
-    const { total, items } = this.state
+    const {
+      total,
+      cardsBought,
+      readyToShow,
+    } = this.state
 
     this.solutions = []
     this.heldSolutions = []
-    this.getPossibleOptions(total, items)
+    this.getPossibleOptions(total, cardsBought)
 
     const solutions = uniqWith(this.solutions, isEqual)
     const heldSolutions = uniqWith(this.heldSolutions, isEqual)
 
-    const solutionDisplay = solutions.map(sol => <div key={shortid.generate()}>{sol.toString()}</div>)
-    const heldSolDisplay = heldSolutions.map(sol => <div key={shortid.generate()}>{`${sol.toString()} + Hold`}</div>)
+    const solutionDisplay = solutions.map(sol =>
+      <div key={shortid.generate()}>{sol.toString()}</div>
+    )
+    const heldSolDisplay = heldSolutions.map(sol =>
+      <div key={shortid.generate()}>{`${sol.toString()} + Hold`}</div>
+    )
     return (
       <div className="App">
         <div className="App-header">
-          <input type="text" value={total} name="total" onChange={this.onTotalChange} />
-          <input type="text" value={items} name="items" onChange={this.onTotalChange} />
-          {`Solutions found: ${solutions.length + heldSolutions.length}`}
-          {solutionDisplay}
-          {heldSolDisplay}
+          { readyToShow ? (
+            <Fragment>
+              <TextField
+                type="text"
+                value={total}
+                onChange={this.onTextChange('total')}
+                label="Total cost"
+                variant="outlined"
+              />
+              <TextField
+                type="text"
+                value={cardsBought}
+                onChange={this.onTextChange('cardsBought')}
+                label="Cards bought"
+                variant="outlined"
+              />
+            </Fragment>
+          ) : (
+            <Fragment>Loading...</Fragment>
+          )}
         </div>
+        {`Solutions found: ${solutions.length + heldSolutions.length}`}
+        {solutionDisplay}
+        {heldSolDisplay}
       </div>
     )
   }
