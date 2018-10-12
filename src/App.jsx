@@ -69,7 +69,9 @@ class App extends PureComponent {
       }
     }
 
-    if (total - sum > remainingItems * max(costs)) {
+    // No need to continue if you can't reach the remaining total
+    // by putting in the most expensive cards. +1 is to account for hold
+    if (total - sum > remainingItems * max(costs) + 1) {
       return
     }
 
