@@ -8,7 +8,7 @@ import max from 'lodash/max'
 import pick from 'lodash/pick'
 import shortid from 'shortid'
 
-import './App.css'
+import styles from './App.module.scss'
 
 class App extends PureComponent {
   constructor(props) {
@@ -41,8 +41,6 @@ class App extends PureComponent {
         ))
 
         const costs = uniq(items.map(item => item.GoldCost))
-
-        console.log(items, costs)
 
         this.setState({
           items,
@@ -105,8 +103,8 @@ class App extends PureComponent {
       <div key={shortid.generate()}>{`${sol.toString()} + Hold`}</div>
     )
     return (
-      <div className="App">
-        <div className="App-header">
+      <div className={styles.app}>
+        <div className={styles.appHeader}>
           { readyToShow ? (
             <Fragment>
               <TextField
@@ -115,6 +113,7 @@ class App extends PureComponent {
                 onChange={this.onTextChange('total')}
                 label="Total cost"
                 variant="outlined"
+                className={styles.textField}
               />
               <TextField
                 type="text"
@@ -122,6 +121,7 @@ class App extends PureComponent {
                 onChange={this.onTextChange('cardsBought')}
                 label="Cards bought"
                 variant="outlined"
+                className={styles.textField}
               />
             </Fragment>
           ) : (

@@ -1,0 +1,20 @@
+.app {
+  text-align: center;
+}
+
+.appHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 16px;
+
+  .textField:not(:last-child) {
+    margin-right: 16px;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+}
