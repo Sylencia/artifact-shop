@@ -3,10 +3,13 @@ import TextField from '@material-ui/core/TextField'
 import uniq from 'lodash/uniq'
 import uniqWith from 'lodash/uniqWith'
 import flatten from 'lodash/flatten'
+import flattenDeep from 'lodash/flattenDeep'
 import isEqual from 'lodash/isEqual'
 import max from 'lodash/max'
 import pick from 'lodash/pick'
 import shortid from 'shortid'
+
+import ItemList from './ItemList'
 
 import styles from './App.module.scss'
 
@@ -42,14 +45,23 @@ class App extends PureComponent {
 
         const costs = uniq(items.map(item => item.GoldCost))
 
+        const itemCostMap = costs.map(cost => {
+          const filteredItems = items.filter(item => item.GoldCost === cost)
+          return {
+            cost,
+            items: filteredItems.map(item => item.Id),
+          }
+        })
+
         this.setState({
           items,
           costs,
+          itemCostMap,
           readyToShow: true })
       })
   }
 
-  getPossibleOptions = (total, remainingItems, partial = []) => {
+  getPossibleOptions = ({ total, remainingItems, partial = [], solutions, heldSolutions }) => {
     const { costs } = this.state
     const sum = partial.reduce((a, b) => a + b, 0)
 
@@ -59,9 +71,9 @@ class App extends PureComponent {
 
     if (remainingItems === 0) {
       if (sum === Number(total)) {
-        this.solutions.push(partial.sort((a, b) => a > b))
+        solutions.push(partial.sort((a, b) => a > b))
       } else if (sum === Number(total) - 1) {
-        this.heldSolutions.push(partial.sort((a, b) => a > b))
+        heldSolutions.push(partial.sort((a, b) => a > b))
       } else {
         return
       }
@@ -74,7 +86,13 @@ class App extends PureComponent {
     }
 
     for (let i = 0; i < costs.length; ++i) {
-      this.getPossibleOptions(total, remainingItems - 1, partial.concat(costs[i]))
+      this.getPossibleOptions({
+        total,
+        remainingItems: remainingItems - 1,
+        partial: partial.concat(costs[i]),
+        solutions,
+        heldSolutions,
+      })
     }
   }
 
@@ -89,19 +107,26 @@ class App extends PureComponent {
       readyToShow,
     } = this.state
 
-    this.solutions = []
-    this.heldSolutions = []
-    this.getPossibleOptions(total, cardsBought)
+    const solutions = []
+    const heldSolutions = []
+    this.getPossibleOptions({
+      total,
+      remainingItems: cardsBought,
+      solutions,
+      heldSolutions,
+    })
 
-    const solutions = uniqWith(this.solutions, isEqual)
-    const heldSolutions = uniqWith(this.heldSolutions, isEqual)
+    const uniqueSolutions = uniqWith(solutions, isEqual)
+    const uniqueHeldSolutions = uniqWith(heldSolutions, isEqual)
+    const uniqueCosts = uniq(flattenDeep(uniqueSolutions))
 
-    const solutionDisplay = solutions.map(sol =>
+    const solutionDisplay = uniqueSolutions.map(sol =>
       <div key={shortid.generate()}>{sol.toString()}</div>
     )
-    const heldSolDisplay = heldSolutions.map(sol =>
+    const heldSolDisplay = uniqueHeldSolutions.map(sol =>
       <div key={shortid.generate()}>{`${sol.toString()} + Hold`}</div>
     )
+
     return (
       <div className={styles.app}>
         <div className={styles.appHeader}>
@@ -128,7 +153,8 @@ class App extends PureComponent {
             <Fragment>Loading...</Fragment>
           )}
         </div>
-        {`Solutions found: ${solutions.length + heldSolutions.length}`}
+        <ItemList cost="3" />
+        {`Solutions found: ${uniqueSolutions.length + uniqueHeldSolutions.length}`}
         {solutionDisplay}
         {heldSolDisplay}
       </div>
