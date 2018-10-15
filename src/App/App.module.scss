@@ -15,6 +15,9 @@
   }
 }
 
-.App-link {
-  color: #61dafb;
+.costDisplay {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }

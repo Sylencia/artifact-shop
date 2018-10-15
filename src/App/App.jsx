@@ -5,11 +5,12 @@ import uniqWith from 'lodash/uniqWith'
 import flatten from 'lodash/flatten'
 import flattenDeep from 'lodash/flattenDeep'
 import isEqual from 'lodash/isEqual'
+import keyBy from 'lodash/keyBy'
 import max from 'lodash/max'
 import pick from 'lodash/pick'
 import shortid from 'shortid'
 
-import ItemList from './ItemList'
+import ItemList from '../ItemList'
 
 import styles from './App.module.scss'
 
@@ -36,6 +37,7 @@ class App extends PureComponent {
           'Name',
           'ItemType',
           'GoldCost',
+          'Abilities',
         ]
         const items = flatten(data.Sets.map(set =>
           set.Cards.filter(isItemCard).map(
@@ -45,13 +47,13 @@ class App extends PureComponent {
 
         const costs = uniq(items.map(item => item.GoldCost))
 
-        const itemCostMap = costs.map(cost => {
+        const itemCostMap = keyBy(costs.map(cost => {
           const filteredItems = items.filter(item => item.GoldCost === cost)
           return {
             cost,
             items: filteredItems.map(item => item.Id),
           }
-        })
+        }), 'cost')
 
         this.setState({
           items,
@@ -71,9 +73,9 @@ class App extends PureComponent {
 
     if (remainingItems === 0) {
       if (sum === Number(total)) {
-        solutions.push(partial.sort((a, b) => a > b))
+        solutions.push(partial.sort((a, b) => a - b))
       } else if (sum === Number(total) - 1) {
-        heldSolutions.push(partial.sort((a, b) => a > b))
+        heldSolutions.push(partial.sort((a, b) => a - b))
       } else {
         return
       }
@@ -105,6 +107,8 @@ class App extends PureComponent {
       total,
       cardsBought,
       readyToShow,
+      itemCostMap,
+      items,
     } = this.state
 
     const solutions = []
@@ -118,7 +122,16 @@ class App extends PureComponent {
 
     const uniqueSolutions = uniqWith(solutions, isEqual)
     const uniqueHeldSolutions = uniqWith(heldSolutions, isEqual)
-    const uniqueCosts = uniq(flattenDeep(uniqueSolutions))
+    const uniqueCosts = uniq(flattenDeep(uniqueSolutions)).sort((a, b) => a - b)
+
+    const costDisplay = uniqueCosts.map(cost => (
+      <ItemList
+        cost={cost}
+        itemList={itemCostMap[cost]}
+        items={items}
+        key={shortid.generate()}
+      />
+    ))
 
     const solutionDisplay = uniqueSolutions.map(sol =>
       <div key={shortid.generate()}>{sol.toString()}</div>
@@ -153,7 +166,9 @@ class App extends PureComponent {
             <Fragment>Loading...</Fragment>
           )}
         </div>
-        <ItemList cost="3" />
+        <div className={styles.costDisplay}>
+          {costDisplay}
+        </div>
         {`Solutions found: ${uniqueSolutions.length + uniqueHeldSolutions.length}`}
         {solutionDisplay}
         {heldSolDisplay}
