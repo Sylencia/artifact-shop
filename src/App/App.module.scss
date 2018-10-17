@@ -1,23 +1,23 @@
 .app {
-  text-align: center;
+    text-align: center;
 }
 
 .appHeader {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 
-  margin-top: 16px;
+    margin-top: 16px;
 
-  .textField:not(:last-child) {
+    .textField:not(:last-child) {
     margin-right: 16px;
-  }
+    }
 }
 
 .costDisplay {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }

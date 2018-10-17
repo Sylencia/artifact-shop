@@ -5,18 +5,8 @@ import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListSubheader from '@material-ui/core/ListSubheader'
 
+import styles from './ItemList.module.scss'
 import Item from '../Item'
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
-  },
-  nested: {
-    paddingLeft: theme.spacing.unit * 4,
-  },
-})
 
 class ItemList extends PureComponent {
   render() {
@@ -24,7 +14,6 @@ class ItemList extends PureComponent {
       cost,
       itemList,
       items,
-      classes,
     } = this.props
 
     const mappedItems = itemList.items.map(id => {
@@ -36,7 +25,7 @@ class ItemList extends PureComponent {
 
     const subheaderString = `${cost} gold`
     return (
-      <div className={classes.root}>
+      <div className={styles.itemList}>
         <List
           component="nav"
           subheader={(

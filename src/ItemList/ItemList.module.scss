@@ -1,0 +1,11 @@
+@import 'src/stylesheets/base';
+
+.itemList {
+    margin-bottom: 8px;
+    width: 100%;
+    background-color: $white;
+
+    @media (min-width: $bp-desktop) {
+        width: 33%;
+    }
+}

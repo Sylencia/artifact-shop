@@ -1,7 +1,11 @@
+@import "src/stylesheets/base";
+
 body {
   margin: 0 auto;
   padding: 0;
   max-width: 1440px;
+
+  background-color: $gray;
 
   font-family: "Roboto", "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
