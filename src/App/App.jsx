@@ -10,7 +10,7 @@ import max from 'lodash/max'
 import pick from 'lodash/pick'
 import shortid from 'shortid'
 
-import ItemList from '../ItemList'
+import ItemList from 'ItemList'
 
 import styles from './App.module.scss'
 

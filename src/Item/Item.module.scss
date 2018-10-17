@@ -1,0 +1,6 @@
+@import 'src/stylesheets/base';
+
+.tooltip {
+    // !important required for overriding material-ui
+    font-size: 12px !important;
+}

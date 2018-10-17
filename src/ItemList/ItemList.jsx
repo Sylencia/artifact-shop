@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import shortid from 'shortid'
-import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListSubheader from '@material-ui/core/ListSubheader'
 
+import Item from 'Item'
 import styles from './ItemList.module.scss'
-import Item from '../Item'
 
 class ItemList extends PureComponent {
   render() {
@@ -47,4 +46,4 @@ ItemList.propTypes = {
   items: PropTypes.shape().isRequired,
 }
 
-export default withStyles(styles)(ItemList)
+export default ItemList
