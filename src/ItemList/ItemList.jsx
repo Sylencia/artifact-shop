@@ -5,6 +5,7 @@ import List from '@material-ui/core/List'
 import ListSubheader from '@material-ui/core/ListSubheader'
 
 import Item from 'Item'
+import GoldIcon from 'assets/gold.png'
 import styles from './ItemList.module.scss'
 
 class ItemList extends PureComponent {
@@ -22,14 +23,14 @@ class ItemList extends PureComponent {
       )
     })
 
-    const subheaderString = `${cost} gold`
     return (
       <div className={styles.itemList}>
         <List
           component="nav"
           subheader={(
             <ListSubheader component="div">
-              {subheaderString}
+              <img className={styles.image} src={GoldIcon} alt="gold" />
+              <div className={styles.cost}>{cost}</div>
             </ListSubheader>
           )}
         >

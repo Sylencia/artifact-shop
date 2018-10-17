@@ -9,3 +9,17 @@
         width: 33%;
     }
 }
+
+.image {
+    width: 50px;
+    height: 50px;
+}
+
+.cost {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -67%);
+    font-size: 1rem;
+    font-weight: bold;
+}

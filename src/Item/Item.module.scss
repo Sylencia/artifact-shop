@@ -4,3 +4,26 @@
     // !important required for overriding material-ui
     font-size: 12px !important;
 }
+
+.dot {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    border-radius: 50%;
+}
+
+.accessory {
+    background-color: $green;
+}
+
+.armor {
+    background-color: $blue;
+}
+
+.consumable {
+    background-color: $space-gray;
+}
+
+.weapon {
+    background-color: $red;
+}
