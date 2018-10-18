@@ -4,7 +4,6 @@ import isEmpty from 'lodash/isEmpty'
 import Chip from '@material-ui/core/Chip'
 
 const Filter = ({ cards, deleteCb }) => {
-  console.log(cards)
   if (isEmpty(cards)) {
     return <div />
   }

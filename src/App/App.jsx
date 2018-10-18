@@ -142,7 +142,6 @@ class App extends PureComponent {
     const uniqueHeldSolutions = uniqWith(heldSolutions, isEqual)
     const combinedUniqueSolutions = [...uniqueSolutions, ...uniqueHeldSolutions]
     const uniqueCosts = uniq(flattenDeep(combinedUniqueSolutions)).sort((a, b) => a - b)
-    console.log(combinedUniqueSolutions, uniqueCosts)
 
     const costDisplay = uniqueCosts.map(cost => (
       <ItemList
