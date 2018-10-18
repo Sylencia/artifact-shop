@@ -10,8 +10,11 @@ import TooltipIcon from '@material-ui/icons/Info'
 
 import styles from './Item.module.scss'
 
-const Item = ({ info }) => (
-  <ListItem button>
+const Item = ({ info, addCb }) => (
+  <ListItem
+    onClick={addCb(info)}
+    button
+  >
     <div className={cx(styles.dot, {
       [styles.accessory]: info.ItemType === 'Accessory',
       [styles.armor]: info.ItemType === 'Armor',
@@ -37,6 +40,7 @@ const Item = ({ info }) => (
 
 Item.propTypes = {
   info: PropTypes.shape().isRequired,
+  addCb: PropTypes.func.isRequired,
 }
 
 export default Item

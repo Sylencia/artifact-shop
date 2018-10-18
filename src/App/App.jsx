@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react'
 import TextField from '@material-ui/core/TextField'
 import uniq from 'lodash/uniq'
 import uniqWith from 'lodash/uniqWith'
+import each from 'lodash/each'
 import flatten from 'lodash/flatten'
 import flattenDeep from 'lodash/flattenDeep'
 import isEqual from 'lodash/isEqual'
@@ -10,6 +11,7 @@ import max from 'lodash/max'
 import pick from 'lodash/pick'
 import shortid from 'shortid'
 
+import Filter from 'Filter'
 import ItemList from 'ItemList'
 
 import styles from './App.module.scss'
@@ -20,9 +22,10 @@ class App extends PureComponent {
 
     this.state = {
       total: 20,
-      cardsBought: 3,
+      itemsToBuy: 3,
       costs: [],
       readyToShow: false,
+      filteredCards: [],
     }
   }
 
@@ -63,39 +66,52 @@ class App extends PureComponent {
       })
   }
 
-  getPossibleOptions = ({ total, remainingItems, partial = [], solutions, heldSolutions }) => {
+  handleAddFilter = card => () => {
+    this.setState(state => ({
+      filteredCards: [...state.filteredCards, card],
+    }))
+  }
+
+  handleDeleteFilter = card => () => {
+    this.setState(state => {
+      const filteredCards = [...state.filteredCards]
+      filteredCards.splice(filteredCards.indexOf(card), 1)
+      return { filteredCards }
+    })
+  }
+
+  getPossibleOptions = ({ total, itemsToBuy, partial = [], solutions, heldSolutions }) => {
     const { costs } = this.state
-    const sum = partial.reduce((a, b) => a + b, 0)
 
-    if (sum > total) {
-      return
-    }
-
-    if (remainingItems === 0) {
-      if (sum === Number(total)) {
+    if (itemsToBuy === 0) {
+      if (total === 0) {
         solutions.push(partial.sort((a, b) => a - b))
-      } else if (sum === Number(total) - 1) {
+      } else if (total === 1) {
         heldSolutions.push(partial.sort((a, b) => a - b))
       } else {
         return
       }
     }
 
-    // No need to continue if you can't reach the remaining total
-    // by putting in the most expensive cards. +1 is to account for hold
-    if (total - sum > remainingItems * max(costs) + 1) {
-      return
-    }
+    each(costs, value => {
+      if (total < value) {
+        return
+      }
 
-    for (let i = 0; i < costs.length; ++i) {
+      // No need to continue if you can't reach the remaining total
+      // by putting in the most expensive cards. +1 is to account for hold
+      if (total > itemsToBuy * max(costs) + 1) {
+        return
+      }
+
       this.getPossibleOptions({
-        total,
-        remainingItems: remainingItems - 1,
-        partial: partial.concat(costs[i]),
+        total: total - value,
+        itemsToBuy: itemsToBuy - 1,
+        partial: partial.concat(value),
         solutions,
         heldSolutions,
       })
-    }
+    })
   }
 
   onTextChange = name => e => {
@@ -105,24 +121,28 @@ class App extends PureComponent {
   render() {
     const {
       total,
-      cardsBought,
+      itemsToBuy,
       readyToShow,
       itemCostMap,
       items,
+      filteredCards,
     } = this.state
 
     const solutions = []
     const heldSolutions = []
+    const filteredCosts = filteredCards.reduce((acc, val) => acc + val.GoldCost, 0)
     this.getPossibleOptions({
-      total,
-      remainingItems: cardsBought,
+      total: total - filteredCosts,
+      itemsToBuy: itemsToBuy - filteredCards.length,
       solutions,
       heldSolutions,
     })
 
     const uniqueSolutions = uniqWith(solutions, isEqual)
     const uniqueHeldSolutions = uniqWith(heldSolutions, isEqual)
-    const uniqueCosts = uniq(flattenDeep(uniqueSolutions)).sort((a, b) => a - b)
+    const combinedUniqueSolutions = [...uniqueSolutions, ...uniqueHeldSolutions]
+    const uniqueCosts = uniq(flattenDeep(combinedUniqueSolutions)).sort((a, b) => a - b)
+    console.log(combinedUniqueSolutions, uniqueCosts)
 
     const costDisplay = uniqueCosts.map(cost => (
       <ItemList
@@ -130,6 +150,7 @@ class App extends PureComponent {
         itemList={itemCostMap[cost]}
         items={items}
         key={shortid.generate()}
+        addCb={this.handleAddFilter}
       />
     ))
 
@@ -155,12 +176,13 @@ class App extends PureComponent {
               />
               <TextField
                 type="text"
-                value={cardsBought}
-                onChange={this.onTextChange('cardsBought')}
+                value={itemsToBuy}
+                onChange={this.onTextChange('itemsToBuy')}
                 label="Cards bought"
                 variant="outlined"
                 className={styles.textField}
               />
+              <Filter cards={filteredCards} deleteCb={this.handleDeleteFilter} />
             </Fragment>
           ) : (
             <Fragment>Loading...</Fragment>

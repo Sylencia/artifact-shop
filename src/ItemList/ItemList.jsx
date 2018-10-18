@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import shortid from 'shortid'
 import List from '@material-ui/core/List'
 import ListSubheader from '@material-ui/core/ListSubheader'
+import Paper from '@material-ui/core/Paper'
 
 import Item from 'Item'
 import GoldIcon from 'assets/gold.png'
@@ -14,17 +15,22 @@ class ItemList extends PureComponent {
       cost,
       itemList,
       items,
+      addCb,
     } = this.props
 
     const mappedItems = itemList.items.map(id => {
       const itemInfo = items.find(item => item.Id === id)
       return (
-        <Item info={itemInfo} key={shortid.generate()} />
+        <Item
+          info={itemInfo}
+          key={shortid.generate()}
+          addCb={addCb}
+        />
       )
     })
 
     return (
-      <div className={styles.itemList}>
+      <Paper className={styles.itemList}>
         <List
           component="nav"
           subheader={(
@@ -36,15 +42,16 @@ class ItemList extends PureComponent {
         >
           {mappedItems}
         </List>
-      </div>
+      </Paper>
     )
   }
 }
 
 ItemList.propTypes = {
-  cost: PropTypes.string.isRequired,
-  itemList: PropTypes.shape().isRequired,
-  items: PropTypes.shape().isRequired,
+  cost: PropTypes.number.isRequired,
+  itemList: PropTypes.shape({}).isRequired,
+  items: PropTypes.shape({}).isRequired,
+  addCb: PropTypes.func.isRequired,
 }
 
 export default ItemList
