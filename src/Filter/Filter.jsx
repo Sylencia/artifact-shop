@@ -22,7 +22,7 @@ const Filter = ({ cards, deleteCb }) => {
 }
 
 Filter.propTypes = {
-  cards: PropTypes.shape({}).isRequired,
+  cards: PropTypes.array.isRequired,
   deleteCb: PropTypes.func.isRequired,
 }
 

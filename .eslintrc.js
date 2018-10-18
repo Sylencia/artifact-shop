@@ -57,6 +57,7 @@ module.exports = {
     'import/prefer-default-export': OFF,
     'jsx-quotes': ['error', 'prefer-double'],
     'react/jsx-pascal-case': OFF,
+    'react/forbid-prop-types': OFF,
     'space-before-function-paren': OFF,
     'no-extra-parens': OFF,
     'camelcase': OFF,

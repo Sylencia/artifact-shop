@@ -51,7 +51,7 @@ class ItemList extends PureComponent {
 ItemList.propTypes = {
   cost: PropTypes.number.isRequired,
   itemList: PropTypes.shape({}).isRequired,
-  items: PropTypes.shape({}).isRequired,
+  items: PropTypes.array.isRequired,
   addCb: PropTypes.func.isRequired,
 }
 
