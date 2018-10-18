@@ -32,6 +32,7 @@ class ItemList extends PureComponent {
     return (
       <Paper className={styles.itemList}>
         <List
+          dense
           component="nav"
           subheader={(
             <ListSubheader component="div">
